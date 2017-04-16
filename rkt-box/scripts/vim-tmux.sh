@@ -6,5 +6,6 @@ yum -y install neovim
 
 yum -y install tmux
 
-
-
+# Pre-create paths and permissions so file provisioner works
+mkdir -p /home/vagrant/.config/nvim/colors
+chown -R vagrant /home/vagrant/.config
