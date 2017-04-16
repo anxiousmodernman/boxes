@@ -1,0 +1,5 @@
+*.vdi
+*.iso
+packer_cache
+*.box
+

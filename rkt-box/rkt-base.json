@@ -1,0 +1,81 @@
+{
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "headless": false,
+            "guest_os_type": "RedHat_64",
+            "disk_size": 20480,
+            "iso_url": "http://mirror.cc.columbia.edu/pub/linux/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso",
+            "iso_checksum": "27bd866242ee058b7a5754e83d8ee8403e216b93d130d800852a96f41c34d86a",
+            "iso_checksum_type": "sha256",
+            "boot_command": [
+                "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+            ],
+            "boot_wait": "12s",
+            "http_directory": "http",
+            "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+            "ssh_username": "vagrant",
+            "ssh_password": "vagrant",
+            "ssh_port": 22,
+            "ssh_wait_timeout": "10000s",
+            "vboxmanage": [
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--memory",
+                    "1024"
+                ],
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--cpus",
+                    "1"
+                ]
+            ],
+            "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p"
+        }
+    ],
+    "post-processors": [
+        {
+            "output": "output/rkt-box.box",
+            "type": "vagrant"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "scripts": [
+                "scripts/vagrant.sh",
+                "scripts/vboxguest.sh",
+                "scripts/rkt.sh",
+                "scripts/git.sh",
+                "scripts/vim-tmux.sh",
+                "scripts/golang.sh",
+                "scripts/compact.sh"
+            ]
+        },
+        {
+            "type": "file",
+            "source": "scripts/.tmux.conf",
+            "destination": "/home/vagrant/.tmux.conf"
+        },
+        {
+            "type": "file",
+            "source": "scripts/init.vim",
+            "destination": "/home/vagrant/.config/nvim/init.vim"
+        },
+        {
+            "type": "file",
+            "source": "scripts/molokai.vim",
+            "destination": "/home/vagrant/.config/nvim/colors/molokai.vim"
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "scripts": [
+                "scripts/vim-plugin.sh"
+            ]
+        }
+    ]
+}
